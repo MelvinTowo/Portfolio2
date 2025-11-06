@@ -45,8 +45,22 @@ html {
   }
 }
 
+/* Custom animation for slow gear rotation */
+@keyframes spinSlow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .liquid-float {
   animation: liquidFloat 6s ease-in-out infinite;
+}
+
+.animate-spin-slow {
+  animation: spinSlow 8s linear infinite;
 }
 
 .glass-shimmer {

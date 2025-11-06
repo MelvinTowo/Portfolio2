@@ -61,7 +61,7 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
   return (
     <div className="fixed inset-0 z-[100] overflow-hidden">
       {/* Loading Screen Background */}
-      <div className={`absolute inset-0 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 transition-all duration-1000 ${
+      <div className={`absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 transition-all duration-1000 ${
         showContent ? 'opacity-0' : 'opacity-100'
       }`}>
         {/* Animated Background Particles */}
@@ -118,9 +118,9 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
             
             <p className="text-white/70 mt-6 text-lg">
               {progress < 30 && "Initializing..."}
-              {progress >= 30 && progress < 60 && "Loading assets..."}
-              {progress >= 60 && progress < 90 && "Preparing experience..."}
-              {progress >= 90 && progress < 100 && "Almost ready..."}
+              {progress >= 30 && progress < 60 && "Loading..."}
+              {progress >= 60 && progress < 90 && "Still loading..."}
+              {progress >= 90 && progress < 100 && "Almost there..."}
               {progress >= 100 && "Welcome!"}
             </p>
           </div>
