@@ -25,7 +25,7 @@ const aboutItems: AboutItem[] = [
   {
     id: 'graduation',
     title: 'Computer Science',
-    description: 'I graduated with a Bachelor of Science in Computer Science from the University of North Texas in 2023. My focuses include Software engineering, Algorithms, and Internet/cloud programming',
+    description: 'I graduated with a Computer Science degree from the University of North Texas in 2023. My focuses include Software engineering, Algorithms, and Internet/cloud programming',
     imagePath: '/assets/graduation.jpeg',
     imageAlt: "Melvin's graduation",
     placeholderIcon: (
@@ -128,7 +128,7 @@ export default function AboutSection({ aboutText }: AboutSectionProps) {
           {aboutItems.map((item) => (
             <div key={item.id} className="relative group">
               <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${item.gradientFrom} ${item.gradientTo} p-6 backdrop-blur-sm border border-white/10 ${item.borderHover} transition-all duration-300 hover:scale-105`}>
-                {item.doodleComponent}
+                {/* {item.doodleComponent} */}
                 
                 <div className="relative w-full h-64 md:h-72 rounded-xl overflow-hidden mb-6 bg-gradient-to-br from-slate-700 to-slate-800 border-4 border-white/20">
                   {/* Placeholder for image */}

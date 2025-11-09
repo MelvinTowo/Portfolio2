@@ -68,7 +68,7 @@ const timelineData: TimelineItem[] = [
     image: '/assets/toshiba.jpeg',
     year: '2023',
     title: 'Joined Toshiba',
-    description: 'Started my journey in through the clouds at Toshiba as a cloud engineer',
+    description: 'Started my journey flying through the cloud at Toshiba as a cloud engineer',
     category: 'Career',
     skills: ['HTML', 'CSS', 'JavaScript']
   },
@@ -271,7 +271,7 @@ export default function Timeline() {
               My Journey
             </h2>
             <p className="text-white/70 text-lg max-w-2xl mx-auto">
-              Key milestones and experiences that shaped my career
+              Key milestones and experiences 
             </p>
           </div>
 
@@ -431,7 +431,7 @@ export default function Timeline() {
                       </p>
                       
                       {/* Skills tags for mobile */}
-                      {item.skills && item.skills.length > 0 && (
+                      {/* {item.skills && item.skills.length > 0 && (
                         <div className="flex flex-wrap gap-1">
                           {item.skills.map((skill, skillIndex) => (
                             <span 
@@ -442,7 +442,7 @@ export default function Timeline() {
                             </span>
                           ))}
                         </div>
-                      )}
+                      )} */}
                     </div>
                   </div>
                 </div>
