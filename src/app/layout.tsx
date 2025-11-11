@@ -20,6 +20,38 @@ const firaCode = Fira_Code({
 export const metadata: Metadata = {
   title: "Melvin Towo - Portfolio",
   description: "Backend & Cloud Infrastructure Engineer | Computer Science Masters Student | Full-Stack Developer",
+  
+  // Favicon and icons
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "any" }
+    ],
+    shortcut: "/favicon-16x16.png",
+    apple: "/apple-touch-icon.png",
+  },
+  
+  // Additional SEO metadata
+  keywords: ["Melvin Towo", "Portfolio", "Backend Engineer", "Cloud Infrastructure", "Full Stack Developer", "Computer Science", "Georgia Tech"],
+  authors: [{ name: "Melvin Towo", url: "https://melvintowo.com" }],
+  creator: "Melvin Towo",
+  
+  // Open Graph metadata for social sharing
+  openGraph: {
+    type: "website",
+    locale: "en",
+    url: "https://melvintowo.com",
+    title: "Melvin Towo - Portfolio",
+    description: "Backend & Cloud Infrastructure Engineer | Computer Science Masters Student | Full-Stack Developer",
+    siteName: "Melvin Towo Portfolio",
+  },
+  
+  // Twitter metadata
+  twitter: {
+    card: "summary_large_image",
+    title: "Melvin Towo - Portfolio",
+    description: "Backend & Cloud Infrastructure Engineer | Computer Science Masters Student | Full-Stack Developer",
+  },
 };
 
 export default function RootLayout({
@@ -28,9 +60,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning={true}>
       <body
         className={`${geistSans.variable} ${firaCode.variable} antialiased`}
+        suppressHydrationWarning={true}
       >
         <Navbar />
         {children}
