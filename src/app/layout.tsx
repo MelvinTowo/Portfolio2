@@ -1,69 +1,63 @@
 import type { Metadata } from "next";
-import { Geist, Fira_Code } from "next/font/google";
+import { Geist, JetBrains_Mono, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
-  fallback: ["system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
-  display: "swap", // Improves loading performance
+  display: "swap",
 });
 
-const firaCode = Fira_Code({
-  variable: "--font-geist-mono", // Keep the same CSS variable name for compatibility
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-mono",
   subsets: ["latin"],
-  fallback: ["'SF Mono'", "Monaco", "'Cascadia Code'", "'Roboto Mono'", "Consolas", "'Courier New'", "monospace"],
-  display: "swap", // Improves loading performance
+  display: "swap",
+});
+
+const instrumentSerif = Instrument_Serif({
+  variable: "--font-serif",
+  weight: "400",
+  style: ["normal", "italic"],
+  subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Melvin Towo - Portfolio",
-  description: "Backend & Cloud Infrastructure Engineer | Computer Science Masters Student | Full-Stack Developer",
-  
-  // Favicon and icons
+  title: "Melvin Towo — Backend & Cloud Engineer",
+  description: "Backend and cloud infrastructure engineer based in Dallas, TX. Currently at Toshiba, pursuing an MS in CS at Georgia Tech.",
   icons: {
     icon: [
       { url: "/favicon.svg", type: "image/svg+xml" },
-      { url: "/favicon.ico", sizes: "any" }
+      { url: "/favicon.ico", sizes: "any" },
     ],
     shortcut: "/favicon-16x16.png",
     apple: "/apple-touch-icon.png",
   },
-  
-  // Additional SEO metadata
-  keywords: ["Melvin Towo", "Portfolio", "Backend Engineer", "Cloud Infrastructure", "Full Stack Developer", "Computer Science", "Georgia Tech"],
+  keywords: ["Melvin Towo", "Backend Engineer", "Cloud Infrastructure", "Georgia Tech", "Toshiba"],
   authors: [{ name: "Melvin Towo", url: "https://melvintowo.com" }],
   creator: "Melvin Towo",
-  
-  // Open Graph metadata for social sharing
   openGraph: {
     type: "website",
     locale: "en",
     url: "https://melvintowo.com",
-    title: "Melvin Towo - Portfolio",
-    description: "Backend & Cloud Infrastructure Engineer | Computer Science Masters Student | Full-Stack Developer",
-    siteName: "Melvin Towo Portfolio",
+    title: "Melvin Towo — Backend & Cloud Engineer",
+    description: "Backend and cloud infrastructure engineer based in Dallas, TX.",
+    siteName: "Melvin Towo",
   },
-  
-  // Twitter metadata
   twitter: {
     card: "summary_large_image",
-    title: "Melvin Towo - Portfolio",
-    description: "Backend & Cloud Infrastructure Engineer | Computer Science Masters Student | Full-Stack Developer",
+    title: "Melvin Towo — Backend & Cloud Engineer",
+    description: "Backend and cloud infrastructure engineer based in Dallas, TX.",
   },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" suppressHydrationWarning={true}>
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${firaCode.variable} antialiased`}
-        suppressHydrationWarning={true}
+        className={`${geistSans.variable} ${jetbrainsMono.variable} ${instrumentSerif.variable} antialiased grain bg-bg text-fg`}
+        suppressHydrationWarning
       >
         <Navbar />
         {children}

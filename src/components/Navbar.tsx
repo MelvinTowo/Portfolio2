@@ -2,10 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { gsap } from 'gsap';
-import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
-
-gsap.registerPlugin(ScrollToPlugin);
+import Link from 'next/link';
 
 interface NavItem {
   id: string;
@@ -14,12 +11,11 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { id: 'home', label: 'Home', href: '#home' },
-  { id: 'about', label: 'About me', href: '#about' },
+  { id: 'home', label: 'Index', href: '#home' },
+  { id: 'about', label: 'About', href: '#about' },
   { id: 'timeline', label: 'Timeline', href: '#timeline' },
-  { id: 'connect', label: "Let's connect", href: '#connect' },
   { id: 'projects', label: 'Projects', href: '/project' },
-
+  { id: 'connect', label: 'Contact', href: '#connect' },
 ];
 
 export default function Navbar() {
@@ -27,357 +23,144 @@ export default function Navbar() {
   const pathname = usePathname();
   const [activeSection, setActiveSection] = useState('home');
   const [scrolled, setScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
-  const isManualNavigation = useRef(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const isManualNav = useRef(false);
 
   useEffect(() => {
-    // Handle hash navigation when component mounts or route changes
-    const handleHashNavigation = () => {
-      const hash = window.location.hash;
-      if (hash) {
-        const targetId = hash.replace('#', '');
-        
-        // Set manual navigation flag to prevent conflicts
-        isManualNavigation.current = true;
-        
-        // Update active section immediately
-        setActiveSection(targetId);
-        
-        const element = document.getElementById(targetId);
-        
-        if (element) {
-          // Wait a bit for page to load, then scroll
-          setTimeout(() => {
-            const scrollDuration = targetId === 'timeline' ? 1.2 : 1.0;
-            const offsetY = targetId === 'timeline' ? 0 : 80;
-            
-            gsap.to(window, {
-              duration: scrollDuration,
-              scrollTo: {
-                y: element,
-                offsetY: offsetY
-              },
-              ease: "power2.inOut",
-              onComplete: () => {
-                // Reset manual flag when scrolling is complete
-                setTimeout(() => {
-                  isManualNavigation.current = false;
-                }, 200);
-              }
-            });
-          }, 100);
-        } else {
-          isManualNavigation.current = false;
-        }
-      }
-    };
-
-    // Handle hash navigation on mount
-    handleHashNavigation();
-
     const handleScroll = () => {
-      const scrollPosition = window.scrollY;
-      setScrolled(scrollPosition > 50);
+      setScrolled(window.scrollY > 20);
+      if (isManualNav.current || pathname !== '/') return;
 
-      // Skip auto-detection if we're manually navigating
-      if (isManualNavigation.current) {
-        return;
+      const ids = ['home', 'about', 'timeline', 'connect'];
+      const y = window.scrollY + 120;
+      let current = 'home';
+      for (const id of ids) {
+        const el = document.getElementById(id);
+        if (el && el.offsetTop <= y) current = id;
       }
-
-      // Only update active section based on scroll if we're on the home page
-      if (pathname !== '/') {
-        return;
-      }
-
-      // Get all sections with their positions
-      const homeSection = document.getElementById('home');
-      const aboutSection = document.getElementById('about');
-      const timelineSection = document.getElementById('timeline');
-      const connectSection = document.getElementById('connect');
-
-      // Define section boundaries more precisely
-      const sections = [
-        { id: 'home', element: homeSection },
-        { id: 'about', element: aboutSection },
-        { id: 'timeline', element: timelineSection },
-        { id: 'connect', element: connectSection }
-      ].filter(section => section.element);
-
-      // Calculate which section we're currently in
-      let activeId = 'home'; // Default to home
-
-      for (let i = 0; i < sections.length; i++) {
-        const section = sections[i];
-        const nextSection = sections[i + 1];
-        
-        if (!section.element) continue;
-        
-        const sectionTop = section.element.offsetTop;
-        
-        // Check if we're in this section's area
-        if (scrollPosition >= sectionTop - 100) {
-          // If there's a next section, make sure we haven't reached it yet
-          if (nextSection && nextSection.element) {
-            const nextSectionTop = nextSection.element.offsetTop;
-            if (scrollPosition < nextSectionTop - 100) {
-              activeId = section.id;
-            }
-          } else {
-            // This is the last section
-            activeId = section.id;
-          }
-        }
-      }
-
-      setActiveSection(activeId);
+      setActiveSection(current);
     };
 
-    window.addEventListener('scroll', handleScroll);
-    handleScroll(); // Call once to set initial state
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, [pathname]);
 
-  // Update active section based on current pathname - with proper async handling
   useEffect(() => {
-    const updateActiveSection = () => {
-      if (pathname === '/project') {
-        setActiveSection('projects');
-      } else if (pathname === '/') {
-        // Only reset to home if we don't have a hash and current section isn't valid for home page
-        const hash = window.location.hash.replace('#', '');
-        if (hash && ['home', 'about', 'timeline', 'connect'].includes(hash)) {
-          setActiveSection(hash);
-        } else if (!hash) {
-          setActiveSection('home');
-        }
-      }
-    };
-
-    // Use requestAnimationFrame for smoother updates
-    const frame = requestAnimationFrame(updateActiveSection);
-    return () => cancelAnimationFrame(frame);
+    if (pathname === '/project') setActiveSection('projects');
+    else if (pathname === '/') {
+      const hash = window.location.hash.replace('#', '');
+      if (hash) setActiveSection(hash);
+    }
   }, [pathname]);
 
-  const handleNavigation = (href: string) => {
-    // Close mobile menu when navigating
-    setIsMobileMenuOpen(false);
-    
-    // Set manual navigation flag to prevent scroll conflicts
-    isManualNavigation.current = true;
-    
-    // Check if it's an external route (starts with /)
-    if (href.startsWith('/')) {
-      // Update active section immediately for projects page
-      if (href === '/project') {
-        setActiveSection('projects');
-      }
-      router.push(href);
-      // Reset manual flag after navigation
-      setTimeout(() => {
-        isManualNavigation.current = false;
-      }, 100);
-      return;
-    }
-    
-    // Handle anchor links for scrolling
-    const targetId = href.replace('#', '');
-    
-    // Update active section immediately for instant visual feedback
-    setActiveSection(targetId);
-    
-    // Check if we're on the home page
-    const isOnHomePage = pathname === '/';
-    
-    if (!isOnHomePage) {
-      // If we're not on the home page, navigate to home with the hash
-      router.push(`/${href}`);
-      // Reset manual flag after navigation
-      setTimeout(() => {
-        isManualNavigation.current = false;
-      }, 100);
-      return;
-    }
-    
-    // If we're on the home page, scroll to the section
-    const element = document.getElementById(targetId);
-    
-    if (!element) {
-      isManualNavigation.current = false;
-      return;
-    }
-    
-    // Optimized scrolling with immediate feedback
-    const scrollDuration = targetId === 'timeline' ? 1.2 : 1.0;
-    const offsetY = targetId === 'timeline' ? 0 : 80;
-    
-    gsap.to(window, {
-      duration: scrollDuration,
-      scrollTo: {
-        y: element,
-        offsetY: offsetY
-      },
-      ease: "power2.inOut",
-      onComplete: () => {
-        // Reset manual flag when scrolling is complete
-        setTimeout(() => {
-          isManualNavigation.current = false;
-        }, 200);
-      }
-    });
-  };
+  const handleNav = (href: string) => {
+    setIsMobileOpen(false);
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
+    if (href.startsWith('/')) {
+      router.push(href);
+      return;
+    }
+
+    const id = href.replace('#', '');
+    isManualNav.current = true;
+    setActiveSection(id);
+
+    if (pathname !== '/') {
+      router.push(`/${href}`);
+      setTimeout(() => (isManualNav.current = false), 400);
+      return;
+    }
+
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setTimeout(() => (isManualNav.current = false), 800);
+    }
   };
 
   return (
     <>
-      {/* Desktop Navigation */}
-      <nav className={`hidden lg:block fixed top-6 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-500 ease-out ${
-        scrolled ? 'scale-95' : 'scale-100'
-      }`}>
-        <div className="relative">
-          {/* Glass background with liquid effect */}
-          <div className="absolute inset-0 bg-white/10 backdrop-blur-xl rounded-full border border-white/20 shadow-2xl">
-            {/* Animated gradient overlay */}
-            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 animate-pulse"></div>
-            {/* Liquid bubble effects */}
-            <div className="absolute top-2 left-4 w-2 h-2 bg-white/30 rounded-full animate-bounce delay-100"></div>
-            <div className="absolute bottom-2 right-6 w-1 h-1 bg-white/40 rounded-full animate-bounce delay-300"></div>
-            <div className="absolute top-3 right-12 w-1.5 h-1.5 bg-white/25 rounded-full animate-bounce delay-500"></div>
-          </div>
+      <header
+        className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
+          scrolled
+            ? 'bg-bg/70 backdrop-blur-xl border-b border-border'
+            : 'bg-transparent'
+        }`}
+      >
+        <div className="max-w-7xl mx-auto flex items-center justify-between px-6 lg:px-10 h-16">
+          <Link
+            href="/"
+            className="group flex items-center gap-2 font-serif italic text-xl text-fg"
+            onClick={() => setActiveSection('home')}
+          >
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-accent group-hover:scale-125 transition-transform" />
+            Melvin Towo
+          </Link>
 
-          {/* Navigation content */}
-          <div className="relative flex items-center px-8 py-4 space-x-8">
+          <nav className="hidden md:flex items-center gap-1">
             {navItems.map((item) => (
               <button
                 key={item.id}
-                onClick={() => handleNavigation(item.href)}
-                onMouseEnter={() => setHoveredItem(item.id)}
-                onMouseLeave={() => setHoveredItem(null)}
-                className={`relative px-4 py-2 text-sm font-medium transition-all duration-300 ease-out transform hover:scale-105 ${
-                  activeSection === item.id
-                    ? 'text-white'
-                    : hoveredItem === item.id
-                    ? 'text-white'
-                    : 'text-white/70'
+                onClick={() => handleNav(item.href)}
+                className={`relative px-3 py-1.5 text-[13px] font-mono uppercase tracking-wider transition-colors ${
+                  activeSection === item.id ? 'text-fg' : 'text-fg-muted hover:text-fg'
                 }`}
               >
-                {/* Active indicator with liquid effect */}
-                <div className={`absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full transition-all duration-300 ease-out z-0 ${
-                  activeSection === item.id ? 'opacity-80 scale-100' : 'opacity-0 scale-95'
-                }`}>
-                  <div className="absolute inset-0 bg-white/20 rounded-full backdrop-blur-sm"></div>
-                </div>
-                
-                {/* Hover effect */}
-                <div className={`absolute inset-0 bg-white/10 rounded-full transition-opacity duration-300 z-0 ${
-                  hoveredItem === item.id ? 'opacity-100' : 'opacity-0'
-                }`}></div>
-                
-                {/* Button content */}
-                <span className="relative z-20">{item.label}</span>
+                {activeSection === item.id && (
+                  <span className="absolute inset-x-3 -bottom-0.5 h-px bg-accent" />
+                )}
+                {item.label}
+              </button>
+            ))}
+          </nav>
+
+          <div className="hidden md:flex items-center gap-2 text-[12px] font-mono text-fg-muted">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full rounded-full bg-accent opacity-60 animate-ping" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-accent" />
+            </span>
+            <span className="uppercase tracking-wider">Available</span>
+          </div>
+
+          <button
+            onClick={() => setIsMobileOpen(!isMobileOpen)}
+            className="md:hidden w-10 h-10 flex flex-col items-center justify-center gap-1.5"
+            aria-label="Toggle menu"
+          >
+            <span
+              className={`w-5 h-px bg-fg transition-transform ${
+                isMobileOpen ? 'translate-y-[3px] rotate-45' : ''
+              }`}
+            />
+            <span
+              className={`w-5 h-px bg-fg transition-transform ${
+                isMobileOpen ? '-translate-y-[3px] -rotate-45' : ''
+              }`}
+            />
+          </button>
+        </div>
+
+        <div
+          className={`md:hidden overflow-hidden transition-all duration-300 border-t border-border ${
+            isMobileOpen ? 'max-h-96 bg-bg' : 'max-h-0'
+          }`}
+        >
+          <div className="px-6 py-4 flex flex-col gap-1">
+            {navItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => handleNav(item.href)}
+                className={`text-left px-2 py-2.5 text-sm font-mono uppercase tracking-wider transition-colors ${
+                  activeSection === item.id ? 'text-accent' : 'text-fg-muted'
+                }`}
+              >
+                {item.label}
               </button>
             ))}
           </div>
-
-          {/* Additional liquid drops for enhanced effect */}
-          <div className="absolute -top-1 left-8 w-3 h-3 bg-gradient-to-br from-blue-400/30 to-transparent rounded-full animate-ping"></div>
-          <div className="absolute -bottom-1 right-8 w-2 h-2 bg-gradient-to-br from-purple-400/30 to-transparent rounded-full animate-ping delay-700"></div>
         </div>
-      </nav>
-
-      {/* Mobile Navigation */}
-      <nav className="lg:hidden fixed top-6 right-6 z-50">
-        {/* Mobile Menu Button */}
-        <button
-          onClick={toggleMobileMenu}
-          className={`relative w-14 h-14 transition-all duration-300 ease-out ${
-            scrolled ? 'scale-95' : 'scale-100'
-          }`}
-        >
-          {/* Glass background with liquid effect */}
-          <div className="absolute inset-0 bg-white/10 backdrop-blur-xl rounded-full border border-white/20 shadow-2xl">
-            {/* Animated gradient overlay */}
-            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 animate-pulse"></div>
-            {/* Liquid bubble effects */}
-            <div className="absolute top-2 left-2 w-1.5 h-1.5 bg-white/30 rounded-full animate-bounce delay-100"></div>
-            <div className="absolute bottom-2 right-2 w-1 h-1 bg-white/40 rounded-full animate-bounce delay-300"></div>
-          </div>
-
-          {/* Hamburger Icon */}
-          <div className="relative flex flex-col items-center justify-center h-full space-y-1.5">
-            <div className={`w-5 h-0.5 bg-white rounded-full transition-all duration-300 ${
-              isMobileMenuOpen ? 'rotate-45 translate-y-2' : ''
-            }`}></div>
-            <div className={`w-5 h-0.5 bg-white rounded-full transition-all duration-300 ${
-              isMobileMenuOpen ? 'opacity-0' : ''
-            }`}></div>
-            <div className={`w-5 h-0.5 bg-white rounded-full transition-all duration-300 ${
-              isMobileMenuOpen ? '-rotate-45 -translate-y-2' : ''
-            }`}></div>
-          </div>
-        </button>
-
-        {/* Mobile Menu Dropdown */}
-        <div className={`absolute top-16 right-0 transition-all duration-300 ease-out origin-top-right ${
-          isMobileMenuOpen 
-            ? 'opacity-100 scale-100 translate-y-0' 
-            : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'
-        }`}>
-          <div className="relative min-w-[200px]">
-            {/* Glass background with liquid effect */}
-            <div className="absolute inset-0 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl">
-              {/* Animated gradient overlay */}
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10 animate-pulse"></div>
-              {/* Liquid bubble effects */}
-              <div className="absolute top-3 left-3 w-2 h-2 bg-white/30 rounded-full animate-bounce delay-100"></div>
-              <div className="absolute bottom-3 right-4 w-1.5 h-1.5 bg-white/40 rounded-full animate-bounce delay-300"></div>
-              <div className="absolute top-1/2 right-3 w-1 h-1 bg-white/25 rounded-full animate-bounce delay-500"></div>
-            </div>
-
-            {/* Menu Items */}
-            <div className="relative p-4 space-y-2">
-              {navItems.map((item, index) => (
-                <button
-                  key={item.id}
-                  onClick={() => handleNavigation(item.href)}
-                  onMouseEnter={() => setHoveredItem(`mobile-${item.id}`)}
-                  onMouseLeave={() => setHoveredItem(null)}
-                  className={`relative w-full text-left px-4 py-3 text-sm font-medium rounded-xl transition-all duration-300 ease-out transform hover:scale-105 ${
-                    activeSection === item.id
-                      ? 'text-white'
-                      : hoveredItem === `mobile-${item.id}`
-                      ? 'text-white'
-                      : 'text-white/70'
-                  }`}
-                  style={{ animationDelay: `${index * 50}ms` }}
-                >
-                  {/* Active indicator with liquid effect */}
-                  <div className={`absolute inset-0 bg-gradient-to-r from-blue-500/30 via-purple-500/30 to-pink-500/30 rounded-xl transition-all duration-300 ease-out z-0 ${
-                    activeSection === item.id ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-                  }`}>
-                    <div className="absolute inset-0 bg-white/10 rounded-xl backdrop-blur-sm"></div>
-                  </div>
-                  
-                  {/* Hover effect */}
-                  <div className={`absolute inset-0 bg-white/10 rounded-xl transition-opacity duration-300 z-0 ${
-                    hoveredItem === `mobile-${item.id}` ? 'opacity-100' : 'opacity-0'
-                  }`}></div>
-                  
-                  {/* Button content */}
-                  <span className="relative z-20">{item.label}</span>
-                </button>
-              ))}
-            </div>
-
-            {/* Additional liquid drops for enhanced effect */}
-            <div className="absolute -top-1 left-4 w-2 h-2 bg-gradient-to-br from-blue-400/30 to-transparent rounded-full animate-ping"></div>
-            <div className="absolute -bottom-1 right-6 w-1.5 h-1.5 bg-gradient-to-br from-purple-400/30 to-transparent rounded-full animate-ping delay-700"></div>
-          </div>
-        </div>
-      </nav>
+      </header>
     </>
   );
 }
