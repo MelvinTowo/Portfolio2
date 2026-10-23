@@ -1,17 +1,19 @@
 'use client';
 
 import { useState } from 'react';
+import { motion } from 'framer-motion';
+
+const links = [
+  { label: 'Email', value: 'melvintowo@gmail.com', href: 'mailto:melvintowo@gmail.com' },
+  { label: 'LinkedIn', value: '/in/melvintowo', href: 'https://www.linkedin.com/in/melvintowo/' },
+  { label: 'GitHub', value: '@MelvinTowo', href: 'https://github.com/MelvinTowo' },
+];
 
 export default function LetsConnect() {
   const [showModal, setShowModal] = useState(false);
   const [visitorName, setVisitorName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState('');
-
-  const handleNotifyClick = () => {
-    setShowModal(true);
-    setSubmitMessage('');
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,9 +23,7 @@ export default function LetsConnect() {
     try {
       const response = await fetch('/api/visitor-notification', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: visitorName.trim(),
           timestamp: new Date().toISOString(),
@@ -31,17 +31,17 @@ export default function LetsConnect() {
       });
 
       if (response.ok) {
-        setSubmitMessage('Thanks for letting me know you were here! 🎉');
+        setSubmitMessage('Thanks for stopping by.');
         setVisitorName('');
         setTimeout(() => {
           setShowModal(false);
           setSubmitMessage('');
         }, 2000);
       } else {
-        setSubmitMessage('Oops! Something went wrong. Please try again.');
+        setSubmitMessage('Something went wrong — try again.');
       }
     } catch {
-      setSubmitMessage('Oops! Something went wrong. Please try again.');
+      setSubmitMessage('Something went wrong — try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -55,127 +55,141 @@ export default function LetsConnect() {
 
   return (
     <>
-      <section id="connect" className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-800 via-purple-900 to-slate-800">
-        <div className="max-w-4xl mx-auto text-center text-white px-6">
-          <h2 className="text-5xl md:text-6xl font-bold mb-8 bg-gradient-to-r from-pink-400 via-purple-500 to-indigo-500 bg-clip-text text-transparent">
-            Let&apos;s Connect
-          </h2>
-          <p className="text-lg md:text-xl text-white/80 mb-8">
-            Ready to collaborate or just want to say hello? I&apos;d love to hear from you!
-          </p>
-          
-          {/* Contact Buttons */}
-          <div className="flex flex-wrap justify-center gap-4 mb-8">
-            <button 
-              onClick={() => window.open('mailto:melvintowo@gmail.com', '_self')}
-              className="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full font-semibold hover:scale-105 transition-transform duration-300"
-            >
-              Email Me
-            </button>
-            <button 
-              onClick={() => window.open('https://www.linkedin.com/in/melvintowo/', '_blank')}
-              className="px-8 py-3 bg-white/10 backdrop-blur-lg border border-white/20 rounded-full font-semibold hover:bg-white/20 transition-all duration-300"
-            >
-              LinkedIn
-            </button>
-            <button 
-              onClick={() => window.open('https://github.com/melvintowo', '_blank')}
-              className="px-8 py-3 bg-white/10 backdrop-blur-lg border border-white/20 rounded-full font-semibold hover:bg-white/20 transition-all duration-300"
-            >
-              GitHub
-            </button>
-          </div>
+      <section id="connect" className="relative py-32 lg:py-40 border-t border-border">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10">
+          <div className="grid lg:grid-cols-12 gap-10">
+            {/* Left: headline */}
+            <div className="lg:col-span-7">
+              <div className="flex items-center gap-3 mb-6 font-mono text-xs uppercase tracking-widest text-fg-muted">
+                <span className="w-8 h-px bg-accent" />
+                Contact
+              </div>
+              <motion.h2
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-100px' }}
+                transition={{ duration: 0.7 }}
+                className="font-serif text-6xl md:text-7xl lg:text-8xl leading-[0.95] text-fg"
+              >
+                Let&apos;s make
+                <br />
+                <span className="italic text-accent">something.</span>
+              </motion.h2>
+              <p className="mt-8 max-w-lg text-lg text-fg-muted leading-relaxed">
+                Whether it&apos;s a project you want to build, a role you&apos;d like to talk about,
+                or just a hello — I read every message.
+              </p>
 
-          {/* Visitor Notification Section */}
-          <div className="border-t border-white/20 pt-8">
-            <h3 className="text-2xl md:text-3xl font-bold mb-4 bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-              Let me know you were here!
-            </h3>
-            <p className="text-white/70 mb-6">
-              Just visiting? Drop your name and I&apos;ll get a notification that you stopped by.
-            </p>
-            <button 
-              onClick={handleNotifyClick}
-              className="px-8 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full font-semibold hover:scale-105 transition-transform duration-300 text-white shadow-lg shadow-yellow-500/25"
-            >
-              👋 Say Hi!
-            </button>
+              <a
+                href="mailto:melvintowo@gmail.com"
+                className="mt-10 inline-flex items-center gap-3 bg-accent text-accent-fg font-mono uppercase text-xs tracking-widest px-6 py-4 rounded-full hover:gap-4 transition-all"
+              >
+                melvintowo@gmail.com
+                <span className="transition-transform group-hover:translate-x-1">→</span>
+              </a>
+            </div>
+
+            {/* Right: links + visitor */}
+            <div className="lg:col-span-5 space-y-4">
+              {links.map((l) => (
+                <a
+                  key={l.label}
+                  href={l.href}
+                  target={l.href.startsWith('mailto') ? undefined : '_blank'}
+                  rel="noopener noreferrer"
+                  className="group flex items-center justify-between p-5 rounded-2xl border border-border bg-bg-elevated hover:border-accent transition-colors"
+                >
+                  <div>
+                    <div className="font-mono text-[10px] uppercase tracking-widest text-fg-subtle mb-1">
+                      {l.label}
+                    </div>
+                    <div className="font-serif text-lg text-fg">{l.value}</div>
+                  </div>
+                  <span className="text-fg-muted group-hover:text-accent transition-colors">↗</span>
+                </a>
+              ))}
+
+              {/* Visitor pill */}
+              <button
+                onClick={() => setShowModal(true)}
+                className="w-full flex items-center justify-between p-5 rounded-2xl border border-dashed border-border-strong hover:border-accent hover:bg-bg-elevated transition-all text-left"
+              >
+                <div>
+                  <div className="font-mono text-[10px] uppercase tracking-widest text-fg-subtle mb-1">
+                    Say hi
+                  </div>
+                  <div className="font-serif italic text-lg text-fg">Just leave your name →</div>
+                </div>
+                <span className="text-accent">✦</span>
+              </button>
+            </div>
           </div>
+        </div>
+
+        {/* Footer strip */}
+        <div className="max-w-7xl mx-auto px-6 lg:px-10 mt-24 pt-8 border-t border-border text-[11px] font-mono uppercase tracking-widest text-fg-subtle">
+          © {new Date().getFullYear()} Melvin Towo
         </div>
       </section>
 
-      {/* Modal Overlay */}
+      {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-slate-800 rounded-2xl p-8 max-w-md w-full border border-white/20 shadow-2xl relative">
-            {/* Close button */}
+        <div className="fixed inset-0 z-[60] bg-bg/70 backdrop-blur-md flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="relative bg-bg-elevated border border-border rounded-3xl p-8 max-w-md w-full"
+          >
             <button
               onClick={closeModal}
-              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 rounded-full transition-all duration-200"
-              aria-label="Close modal"
+              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-fg-muted hover:text-fg"
+              aria-label="Close"
             >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
+              ×
             </button>
 
-            <div className="text-center">
-              <h3 className="text-2xl font-bold text-white mb-2">
-                Howdy! 
-              </h3>
-              <p className="text-white/70 mb-6">
-                Whats ur name? 
-              </p>
-              
-              {submitMessage ? (
-                <div className={`p-4 rounded-lg mb-4 ${
-                  submitMessage.includes('Thanks') 
-                    ? 'bg-green-500/20 text-green-300 border border-green-500/30' 
-                    : 'bg-red-500/20 text-red-300 border border-red-500/30'
-                }`}>
-                  {submitMessage}
-                </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <input
-                    type="text"
-                    value={visitorName}
-                    onChange={(e) => setVisitorName(e.target.value)}
-                    placeholder="Enter your name"
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
-                    maxLength={50}
-                    required
-                  />
-                  <div className="flex gap-3">
-                    <button
-                      type="button"
-                      onClick={closeModal}
-                      className="flex-1 px-6 py-3 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20 transition-all duration-300"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={isSubmitting || !visitorName.trim()}
-                      className="flex-1 px-6 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-lg text-white font-semibold hover:scale-105 transition-transform duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-                    >
-                      {isSubmitting ? 'Notifying...' : 'Notify'}
-                    </button>
-                  </div>
-                </form>
-              )}
+            <div className="font-mono text-[10px] uppercase tracking-widest text-fg-subtle mb-2">
+              Guest book
             </div>
-          </div>
+            <h3 className="font-serif text-3xl text-fg mb-6">
+              What&apos;s your <span className="italic">name?</span>
+            </h3>
+
+            {submitMessage ? (
+              <div className="p-4 rounded-xl bg-accent-soft border border-accent/30 text-fg">
+                {submitMessage}
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <input
+                  type="text"
+                  value={visitorName}
+                  onChange={(e) => setVisitorName(e.target.value)}
+                  placeholder="Type your name"
+                  className="w-full px-4 py-3 bg-bg border border-border rounded-xl text-fg placeholder-fg-subtle focus:outline-none focus:border-accent transition-colors"
+                  maxLength={50}
+                  required
+                  autoFocus
+                />
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={closeModal}
+                    className="flex-1 px-5 py-3 border border-border rounded-xl text-fg-muted font-mono uppercase text-xs tracking-widest hover:text-fg transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSubmitting || !visitorName.trim()}
+                    className="flex-1 px-5 py-3 bg-accent text-accent-fg font-mono uppercase text-xs tracking-widest rounded-xl disabled:opacity-50 transition-opacity"
+                  >
+                    {isSubmitting ? 'Sending…' : 'Say hi'}
+                  </button>
+                </div>
+              </form>
+            )}
+          </motion.div>
         </div>
       )}
     </>
