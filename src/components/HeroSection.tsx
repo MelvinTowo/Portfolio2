@@ -25,6 +25,7 @@ interface Star {
 
 export default function HeroSection({ summaryText }: HeroSectionProps) {
   const [stars, setStars] = useState<Star[]>([]);
+  const [now, setNow] = useState('');
 
   useEffect(() => {
     const count = window.innerWidth < 768 ? 60 : 120;
@@ -38,11 +39,20 @@ export default function HeroSection({ summaryText }: HeroSectionProps) {
       duration: 2.5 + Math.random() * 3.5,
     }));
     setStars(generated);
-  }, []);
 
-  const now = new Date().toLocaleTimeString('en-US', {
-    hour: '2-digit', minute: '2-digit', timeZone: 'America/Chicago', hour12: false,
-  });
+    const updateNow = () =>
+      setNow(
+        new Date().toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+          timeZone: 'America/Chicago',
+          hour12: false,
+        }),
+      );
+    updateNow();
+    const id = setInterval(updateNow, 30_000);
+    return () => clearInterval(id);
+  }, []);
 
   return (
     <section id="home" className="relative min-h-screen pt-24 pb-16 overflow-hidden">
@@ -69,7 +79,9 @@ export default function HeroSection({ summaryText }: HeroSectionProps) {
 
       {/* Meta strip */}
       <div className="relative max-w-7xl mx-auto px-6 lg:px-10 flex items-center justify-between text-[11px] font-mono uppercase tracking-widest text-fg-subtle">
-        <span className="hidden sm:inline">Dallas, TX · {now} CT</span>
+        <span className="hidden sm:inline">
+          Dallas, TX{now && ` · ${now} CT`}
+        </span>
         <span className="sm:hidden">Dallas, TX</span>
         <span>2026 —</span>
       </div>

@@ -52,13 +52,6 @@ const timelineData: TimelineItem[] = [
     category: 'Education',
     location: 'Atlanta, GA',
   },
-  {
-    id: 6,
-    year: '20—?',
-    title: 'What comes next',
-    description: 'Not sure yet — but it will be bright.',
-    category: 'Personal',
-  },
 ];
 
 // Bento layout per entry — pure typographic rhythm
@@ -68,7 +61,6 @@ const layouts = [
   'md:col-span-2', // 2022
   'md:col-span-2', // 2023
   'md:col-span-2', // 2025
-  'md:col-span-6', // future — full width
 ] as const;
 
 export default function Timeline() {
@@ -105,7 +97,6 @@ export default function Timeline() {
               item={item}
               index={i}
               className={layouts[i] ?? 'md:col-span-2'}
-              isFinal={i === timelineData.length - 1}
             />
           ))}
         </div>
@@ -118,10 +109,9 @@ interface TimelineBentoCardProps {
   item: TimelineItem;
   index: number;
   className?: string;
-  isFinal: boolean;
 }
 
-function TimelineBentoCard({ item, index, className = '', isFinal }: TimelineBentoCardProps) {
+function TimelineBentoCard({ item, index, className = '' }: TimelineBentoCardProps) {
   const label = `${String(index + 1).padStart(2, '0')} — ${item.category}`;
 
   return (
@@ -130,11 +120,7 @@ function TimelineBentoCard({ item, index, className = '', isFinal }: TimelineBen
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-80px' }}
       transition={{ duration: 0.5 }}
-      className={`group relative overflow-hidden rounded-2xl border bg-bg-elevated transition-colors ${
-        isFinal
-          ? 'border-dashed border-border-strong hover:border-accent'
-          : 'border-border hover:border-border-strong'
-      } ${className}`}
+      className={`group relative overflow-hidden rounded-2xl border border-border bg-bg-elevated hover:border-border-strong transition-colors ${className}`}
     >
       <div className="relative p-6 lg:p-8">
         <div className="flex items-center justify-between gap-2 mb-4 font-mono text-[10px] uppercase tracking-widest text-fg-subtle">
@@ -144,25 +130,11 @@ function TimelineBentoCard({ item, index, className = '', isFinal }: TimelineBen
 
         <div className="font-serif italic text-accent text-base mb-2">{item.year}</div>
 
-        <h3
-          className={`font-serif text-fg mb-3 leading-tight ${
-            isFinal ? 'text-4xl lg:text-5xl' : 'text-2xl lg:text-3xl'
-          }`}
-        >
-          {isFinal ? (
-            <>
-              What <span className="italic">comes next</span>
-            </>
-          ) : (
-            item.title
-          )}
+        <h3 className="font-serif text-fg mb-3 leading-tight text-2xl lg:text-3xl">
+          {item.title}
         </h3>
 
-        <p
-          className={`text-fg-muted leading-relaxed ${
-            isFinal ? 'text-base lg:text-lg max-w-2xl' : 'text-sm'
-          }`}
-        >
+        <p className="text-sm text-fg-muted leading-relaxed">
           {item.description}
         </p>
       </div>
